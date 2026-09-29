@@ -1,0 +1,14 @@
+# 개인 키 / 계좌 정보 (절대 업로드 금지)
+config.yaml
+.token_cache.json
+.state.json
+
+# 실행 결과
+logs/
+
+# Python / 빌드 산출물
+__pycache__/
+*.pyc
+build/
+dist/
+*.spec
