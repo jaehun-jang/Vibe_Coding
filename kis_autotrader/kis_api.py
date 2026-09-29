@@ -93,10 +93,15 @@ class KisClient:
             self._throttle()
             try:
                 if method == "GET":
-                    r = self.session.get(url, headers=self._headers(tr_id), params=params, timeout=10)
+                    r = self.session.get(url, headers=self._headers(tr_id), params=params, timeout=(5, 20))
                 else:
-                    r = self.session.post(url, headers=self._headers(tr_id), data=json.dumps(body), timeout=10)
+                    r = self.session.post(url, headers=self._headers(tr_id), data=json.dumps(body), timeout=(5, 20))
                 data = r.json()
+            except requests.Timeout:
+                # 모의투자 서버는 응답이 느릴 때가 많아 재시도로 대부분 해결됨
+                log.info("서버 응답 지연 → 재시도 (%s/%s)", attempt, retries)
+                time.sleep(1.5 * attempt)
+                continue
             except (requests.RequestException, ValueError) as e:
                 log.warning("요청 실패(%s/%s) %s: %s", attempt, retries, path, e)
                 time.sleep(1.5 * attempt)
@@ -144,7 +149,7 @@ class KisClient:
     def _issue_token(self) -> str:
         url = self.base_url + "/oauth2/tokenP"
         body = {"grant_type": "client_credentials", "appkey": self.app_key, "appsecret": self.app_secret}
-        r = self.session.post(url, data=json.dumps(body), headers={"content-type": "application/json"}, timeout=10)
+        r = self.session.post(url, data=json.dumps(body), headers={"content-type": "application/json"}, timeout=(5, 20))
         data = r.json()
         if "access_token" not in data:
             raise KisApiError(f"토큰 발급 실패: {data}")
