@@ -3,7 +3,7 @@ chcp 65001 > nul
 cd /d "%~dp0"
 
 echo ============================================
-echo   KIS 자동매매 실행파일(.exe) 만들기
+echo   KIS 자동매매 앱(.exe) 만들기
 echo ============================================
 echo.
 
@@ -19,20 +19,18 @@ python -m pip install --upgrade -r requirements.txt pyinstaller
 if errorlevel 1 goto fail
 
 echo.
-echo [2/3] 실행파일 만드는 중... (1~2분 걸립니다)
-python -m PyInstaller --noconfirm --onefile --console --name KIS_AutoTrader main.py
+echo [2/3] 앱 만드는 중... (1~2분 걸립니다)
+python -m PyInstaller --noconfirm --onefile --windowed --name KIS_AutoTrader gui.py
 if errorlevel 1 goto fail
 
 echo.
 echo [3/3] 설정 파일 복사 중...
-copy /Y config.example.yaml dist\config.example.yaml > nul
 if exist config.yaml copy /Y config.yaml dist\config.yaml > nul
 
 echo.
 echo ============================================
-echo   완료! dist 폴더를 확인하세요.
-echo   - KIS_AutoTrader.exe  : 더블클릭해서 실행
-echo   - config.yaml         : 같은 폴더에 있어야 합니다
+echo   완료! dist 폴더의 KIS_AutoTrader.exe 를 더블클릭하세요.
+echo   (config.yaml 이 없으면 앱이 설정 창을 먼저 띄웁니다)
 echo ============================================
 explorer dist
 pause
