@@ -1,0 +1,16 @@
+{
+  "name": "소방전기 실기 두문자 암기장",
+  "short_name": "소방전기 암기",
+  "description": "소방설비기사(전기) 실기 두문자 카드, 설치기준 서술형, 숫자 단답형",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#EEF1EE",
+  "theme_color": "#0A7A45",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

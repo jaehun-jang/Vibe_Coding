@@ -4,6 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>소방전기 실기 두문자 암기장</title>
+<meta name="theme-color" content="#0A7A45">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="소방전기 암기">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
@@ -50,12 +56,21 @@ input[type=search]{flex:1;min-width:140px;border:1px solid var(--line);backgroun
 .tab[aria-selected="true"]{background:var(--green);border-color:var(--green);color:#fff}
 .tab.quiz{border-color:var(--red);color:var(--red)}
 .tab.quiz[aria-selected="true"]{background:var(--red);border-color:var(--red);color:#fff}
+.tab.essay{border-color:var(--ink)}
+.tab.essay[aria-selected="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
 .tab .n{opacity:.7;margin-left:4px;font-size:12px}
 .progress{font-size:13px;color:var(--muted);margin:14px 0 6px;display:flex;justify-content:space-between;gap:8px}
 .meter{height:4px;background:var(--chip);border-radius:4px;overflow:hidden;margin-bottom:14px}
 .meter i{display:block;height:100%;background:var(--green);width:0;transition:width .3s}
 .sec{font-family:"Black Han Sans",sans-serif;font-weight:400;font-size:19px;margin:26px 0 10px;color:var(--green)}
 .sec.q{color:var(--red)}
+.sec.e{color:var(--ink)}
+.eq{font-size:16px;font-weight:700;line-height:1.55;margin:10px 0 0}
+.eq::before{content:"문제  ";color:var(--muted);font-size:12px;font-weight:700}
+.draft{width:100%;min-height:92px;margin-top:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit;font-size:15px;padding:8px 10px;resize:vertical}
+.mine{margin:10px 0 0;padding:8px 10px;border-radius:6px;background:var(--chip);font-size:14px;white-space:pre-wrap}
+.mine::before{content:"내 답안\A";white-space:pre;color:var(--muted);font-size:12px;font-weight:700}
+.tools{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;margin:0 0 12px}
 .card.ok{border-left:4px solid var(--green)}
 .card.again{border-left:4px solid var(--red)}
@@ -108,7 +123,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--green);outline-
     <div class="exit" aria-label="시험까지 남은 날"><b id="dday">D-</b><small>11월 7일 실기</small></div>
     <div>
       <h1>소방전기 실기 두문자 암기장</h1>
-      <p class="sub">빨간 칸 = 두문자 · 소리 내어 읽고 연상 문장으로 붙이기</p>
+      <p class="sub">빨간 칸 = 두문자 · 소리 내어 읽고 연상 문장으로 붙이기 · 인터넷 없이도 열립니다</p>
     </div>
   </header>
 
@@ -136,10 +151,12 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--green);outline-
   <main id="list"></main>
 
   <footer>
-    숫자 단답형은 '가리고 떠올리기'에서 빈칸에 숫자만 입력하고 채점하세요 (단위·쉼표는 생략해도 됩니다).
+    설치기준 서술형은 '가리고 떠올리기'에서 문제만 보고 답안을 써 본 뒤 정답과 비교하세요.
+    숫자 단답형은 빈칸에 숫자만 입력하고 채점하면 됩니다 (단위·쉼표 생략 가능).
     기준: 화재안전기술기준(NFTC) 현행본, 자동화재탐지설비는 2026.3.1 시행 개정 반영.
     2026.5.4 개정 고시(NFPC 201·205·304·504·505·602)의 세부 변경은 법령정보센터에서 한 번 더 확인하세요.
-    체크 기록은 이 기기 브라우저에만 저장됩니다.
+    체크 기록은 이 기기 브라우저에만 저장됩니다. 다른 기기로 옮길 때는 아래 버튼을 쓰세요.
+    <div class="tools"><button class="btn" id="bkOut">기록 내보내기</button><button class="btn" id="bkIn">기록 불러오기</button></div>
   </footer>
 </div>
 
@@ -474,18 +491,117 @@ const PARTS = [
  {s:"CO₂", q:"기동용 가스용기 용적 {5}L 이상, 비활성기체 {6}MPa 이상 충전"},
  {s:"CO₂", q:"음향경보장치는 약제 방사 개시 후 {1}분 이상 경보 계속", hot:1},
  {s:"고층건축물", q:"비상전원: 30~49층은 {40}분, 50층 이상은 {60}분 이상"}
+]},
+{name:"설치기준 서술형", essay:1, items:[
+ {s:"경계구역", q:"자동화재탐지설비의 경계구역 설정기준 3가지를 쓰시오.", ref:"경계구역 설정기준", hot:1},
+ {s:"경계구역", q:"계단·경사로·엘리베이터 승강로 등의 경계구역 설정기준을 쓰시오.", ref:"경계구역 별도 설정 (수직·기타)"},
+ {s:"감지기", q:"감지기를 설치하지 않을 수 있는 장소 5가지를 쓰시오.", ref:"감지기 설치제외 장소", hot:1},
+ {s:"감지기", q:"연기감지기를 설치해야 하는 장소 5가지를 쓰시오.", ref:"연기감지기를 설치해야 하는 장소", hot:1},
+ {s:"감지기", q:"지하층·무창층 등 일시적으로 비화재보가 우려되는 장소에 설치할 수 있는 감지기 8가지를 쓰시오.", ref:"비화재보 우려 장소에 설치하는 감지기", hot:1},
+ {s:"감지기", q:"축적형 감지기를 설치하지 않아야 하는 장소 3가지를 쓰시오.", ref:"축적형 감지기를 쓰면 안 되는 장소"},
+ {s:"감지기", q:"연기감지기의 설치기준을 쓰시오. (부착높이별 바닥면적, 복도·계단 설치간격 포함)", ref:"연기감지기 설치기준 (수치)", hot:1},
+ {s:"감지기", q:"스포트형 열감지기(차동식·보상식·정온식)의 설치기준을 쓰시오.", ref:"스포트형 감지기 설치기준"},
+ {s:"감지기", q:"공기관식 차동식분포형감지기의 설치기준을 쓰시오.", ref:"공기관식 차동식분포형 설치기준", hot:1},
+ {s:"감지기", q:"광전식분리형감지기의 설치기준 5가지를 쓰시오.", ref:"광전식분리형 감지기 설치기준", hot:1},
+ {s:"감지기", q:"불꽃감지기의 설치기준 4가지를 쓰시오.", ref:"불꽃감지기 설치기준"},
+ {s:"감지기", q:"부착높이 15m 이상 20m 미만, 20m 이상에 설치할 수 있는 감지기를 각각 쓰시오.", ref:"부착높이별 설치 가능한 감지기"},
+ {s:"감지기", q:"열전대식·열반도체식 차동식분포형감지기의 설치기준을 쓰시오.", ref:"열전대식·열반도체식 설치기준"},
+ {s:"감지기", q:"차동식스포트형(공기팽창식) 감지기의 구성요소 5가지를 쓰고, 리크구멍의 기능을 설명하시오.", ref:"차동식 스포트형(공기팽창식) 감지기 구성"},
+ {s:"감지기", q:"공기관식 차동식분포형감지기의 시험 종류 5가지를 쓰시오.", ref:"공기관식 감지기 시험 종류"},
+ {s:"수신기", q:"자동화재탐지설비 수신기의 설치기준을 5가지 이상 쓰시오.", ref:"수신기 설치기준", hot:1},
+ {s:"수신기", q:"수신기 선정 기준과 축적기능이 있는 수신기를 설치해야 하는 장소를 쓰시오.", ref:"수신기 선정 기준"},
+ {s:"수신기", q:"R형 수신기가 P형 수신기보다 유리한 점을 쓰시오.", ref:"R형 수신기 특징"},
+ {s:"중계기", q:"자동화재탐지설비 중계기의 설치기준 5가지를 쓰시오.", ref:"중계기 설치기준", hot:1},
+ {s:"발신기", q:"발신기의 설치기준을 쓰시오. (설치높이, 수평거리, 위치표시등 포함)", ref:"발신기 설치기준", hot:1},
+ {s:"음향장치", q:"자동화재탐지설비 음향장치의 설치기준과 구조·성능 기준을 쓰시오.", ref:"음향장치 설치기준"},
+ {s:"음향장치", q:"우선경보방식을 적용하는 대상과 발화층별 경보 대상 층을 쓰시오.", ref:"우선경보방식 (11층 이상, 공동주택 16층 이상)", hot:1},
+ {s:"시각경보", q:"시각경보장치의 설치기준 4가지를 쓰시오.", ref:"시각경보장치 설치기준"},
+ {s:"배선", q:"감지기회로의 도통시험을 위한 종단저항의 설치기준 3가지를 쓰시오.", ref:"종단저항 설치기준", hot:1},
+ {s:"배선", q:"자동화재탐지설비 배선의 설치기준을 쓰시오. (절연저항, 공통선, 전로저항 포함)", ref:"자동화재탐지설비 배선기준", hot:1},
+ {s:"배선", q:"감지기 사이의 회로 배선을 송배선식으로 하는 이유를 쓰시오.", d:"도통", mn:"송배선 = 끝까지 도통시험", src:"NFTC 203 2.8.1.4",
+  a:["감지기회로의 [도통시험]을 쉽게 하기 위해 (회로 끝의 종단저항까지 단선 여부 확인)","배선 형태: 감지기를 거쳐 다시 돌아오도록 배선 → 루프(종단) 구간 2가닥, 그 외 4가닥"]},
+ {s:"배선", q:"교차회로방식의 정의를 쓰고, 이를 적용하는 소화설비를 쓰시오.", ref:"교차회로방식 적용 설비", hot:1},
+ {s:"수신기 시험", q:"P형 수신기의 기능시험 종류 9가지를 쓰시오.", ref:"P형 수신기 시험 9가지", hot:1},
+ {s:"수신기 시험", q:"회로도통시험의 목적, 시험방법, 판정기준을 쓰시오.", ref:"회로도통시험", hot:1},
+ {s:"수신기 시험", q:"공통선시험의 목적, 시험방법, 판정기준을 쓰시오.", ref:"공통선시험", hot:1},
+ {s:"수신기 시험", q:"예비전원시험의 목적, 시험방법, 판정기준을 쓰시오.", ref:"예비전원시험 판정기준", hot:1},
+ {s:"수신기 시험", q:"화재표시작동시험의 시험방법과 판정기준을 쓰시오.", ref:"화재표시작동시험"},
+ {s:"수신기 시험", q:"동시작동시험의 목적, 방법, 판정기준을 쓰시오.", ref:"동시작동시험"},
+ {s:"절연", q:"절연저항 기준별(DC 250V 0.1MΩ / DC 500V 5·20·50·1,000MΩ) 적용 대상을 쓰시오.", ref:"절연저항 기준 총정리", hot:1},
+ {s:"절연", q:"정격전압에 따른 절연내력 시험전압을 쓰시오.", ref:"절연내력 시험전압"},
+ {s:"비상방송", q:"비상방송설비 음향장치의 설치기준을 쓰시오.", ref:"비상방송설비 음향장치 설치기준", hot:1},
+ {s:"비상방송", q:"비상방송설비의 배선 및 전원 설치기준을 쓰시오.", ref:"비상방송설비 배선·전원"},
+ {s:"비상경보", q:"비상경보설비(비상벨·자동식사이렌)의 설치기준을 쓰시오.", ref:"비상경보설비 설치기준"},
+ {s:"단독경보형", q:"단독경보형감지기의 설치기준을 쓰시오.", ref:"단독경보형감지기 설치기준"},
+ {s:"속보설비", q:"자동화재속보설비의 설치기준을 쓰시오.", ref:"자동화재속보설비"},
+ {s:"가스누설", q:"분리형 가스누설경보기 탐지부와 수신부의 설치기준을 쓰시오.", ref:"가스누설경보기 (분리형) 탐지부·수신부"},
+ {s:"가스누설", q:"가스누설경보기를 설치하지 않아야 하는 장소 5가지를 쓰시오.", ref:"가스누설경보기 설치제외 장소"},
+ {s:"누전경보기", q:"누전경보기의 설치방법을 쓰시오. (1급·2급 구분, 변류기 설치위치)", ref:"누전경보기 설치방법", hot:1},
+ {s:"누전경보기", q:"누전경보기 수신부를 설치하지 않아야 하는 장소 5가지를 쓰시오.", ref:"수신부 설치제외 장소", hot:1},
+ {s:"누전경보기", q:"누전경보기 전원의 설치기준을 쓰시오.", ref:"누전경보기 전원", hot:1},
+ {s:"누전경보기", q:"누전경보기의 구성요소 4가지를 쓰시오.", ref:"누전경보기 구성요소"},
+ {s:"유도등", q:"피난구유도등의 설치장소 4가지와 설치높이를 쓰시오.", ref:"피난구유도등 설치장소", hot:1},
+ {s:"유도등", q:"복도통로유도등·거실통로유도등·계단통로유도등의 설치기준을 쓰시오.", ref:"통로유도등 설치기준", hot:1},
+ {s:"유도등", q:"유도등을 3선식 배선으로 할 수 있는 장소 3가지를 쓰시오.", ref:"3선식 배선이 가능한 장소", hot:1},
+ {s:"유도등", q:"3선식 배선 유도등이 자동으로 점등되어야 하는 경우 5가지를 쓰시오.", ref:"3선식 유도등이 자동 점등되는 경우", hot:1},
+ {s:"유도등", q:"유도등 비상전원의 용량 기준과 60분 이상으로 해야 하는 대상을 쓰시오.", ref:"유도등 전원·비상전원", hot:1},
+ {s:"유도등", q:"피난구유도등·통로유도등·객석유도등을 설치하지 않아도 되는 경우를 쓰시오.", ref:"유도등 설치제외"},
+ {s:"유도등", q:"객석유도등의 설치개수 산정식을 쓰시오.", ref:"객석유도등 개수"},
+ {s:"유도등", q:"특정소방대상물의 용도별로 설치해야 하는 유도등의 종류를 쓰시오.", ref:"설치장소별 유도등 종류"},
+ {s:"유도등", q:"유도표지의 설치기준을 쓰시오.", ref:"유도표지 설치기준"},
+ {s:"비상조명등", q:"비상조명등의 설치기준을 쓰시오.", ref:"비상조명등 설치기준", hot:1},
+ {s:"비상조명등", q:"비상조명등을 설치하지 않아도 되는 경우 2가지를 쓰시오.", ref:"비상조명등 설치제외", hot:1},
+ {s:"비상조명등", q:"휴대용비상조명등의 설치기준을 쓰시오.", ref:"휴대용비상조명등", hot:1},
+ {s:"비상콘센트", q:"비상콘센트설비 전원회로의 설치기준을 쓰시오.", ref:"비상콘센트 전원회로", hot:1},
+ {s:"비상콘센트", q:"비상콘센트설비의 상용전원 및 비상전원 설치기준을 쓰시오.", ref:"비상콘센트 상용·비상전원", hot:1},
+ {s:"비상콘센트", q:"비상콘센트의 설치위치 기준을 쓰시오. (설치높이, 배치, 수평거리)", ref:"비상콘센트 설치위치", hot:1},
+ {s:"비상콘센트", q:"비상콘센트 플러그접속기의 형태와 보호함의 설치기준을 쓰시오.", ref:"플러그접속기·보호함"},
+ {s:"비상콘센트", q:"비상콘센트설비의 절연저항 및 절연내력 기준을 쓰시오.", ref:"비상콘센트 절연저항·절연내력"},
+ {s:"무선통신", q:"무선통신보조설비 누설동축케이블 등의 설치기준을 쓰시오.", ref:"무선통신보조설비 누설동축케이블", hot:1},
+ {s:"무선통신", q:"무선통신보조설비 증폭기 및 무선중계기의 설치기준을 쓰시오.", ref:"증폭기 설치기준", hot:1},
+ {s:"무선통신", q:"분배기·분파기·혼합기의 설치기준 3가지를 쓰시오.", ref:"분배기·분파기·혼합기"},
+ {s:"무선통신", q:"옥외안테나의 설치기준과 무선통신보조설비를 설치하지 않을 수 있는 경우를 쓰시오.", ref:"옥외안테나·설치제외"},
+ {s:"무선통신", q:"누설동축케이블 표시 'LCX-FR-SS-42D-14-6'의 각 기호 의미를 쓰시오.", ref:"누설동축케이블 표시 읽기"},
+ {s:"배선", q:"소방용 내화배선의 공사방법을 쓰시오.", ref:"내화배선 공사방법", hot:1},
+ {s:"배선", q:"소방용 내열배선의 공사방법을 쓰시오.", ref:"내열배선 공사방법", hot:1},
+ {s:"비상전원", q:"비상전원(자가발전설비·축전지설비 등)의 공통 설치기준 5가지를 쓰시오.", ref:"비상전원 공통 설치기준", hot:1},
+ {s:"비상전원", q:"설비별 비상전원 용량(10·20·30·60분)을 쓰시오.", ref:"설비별 비상전원 용량", hot:1},
+ {s:"비상전원", q:"비상전원수전설비의 종류를 특고압·고압 수전과 저압 수전으로 나누어 쓰시오.", ref:"비상전원수전설비 종류", hot:1},
+ {s:"비상전원", q:"큐비클형 비상전원수전설비 외함과 배전반의 수치 기준을 쓰시오.", ref:"큐비클형·배전반 수치"},
+ {s:"축전지", q:"축전지설비의 구성요소와 충전방식의 종류를 쓰시오.", ref:"축전지 설비"},
+ {s:"제어반", q:"감시제어반의 기능 6가지를 쓰시오.", ref:"감시제어반 기능", hot:1},
+ {s:"제어반", q:"감시제어반에서 도통시험 및 작동시험을 할 수 있어야 하는 확인회로를 쓰시오.", ref:"도통·작동시험 대상 확인회로", hot:1},
+ {s:"제어반", q:"감시제어반 전용실의 설치기준을 쓰시오.", ref:"감시제어반 설치기준"},
+ {s:"제어반", q:"동력제어반의 설치기준 3가지를 쓰시오.", ref:"동력제어반"},
+ {s:"제어반", q:"감시제어반과 동력제어반을 구분하지 않아도 되는 경우를 쓰시오.", ref:"감시·동력제어반 구분 생략 가능"},
+ {s:"가스계", q:"이산화탄소소화설비 수동식 기동장치의 설치기준을 쓰시오.", ref:"CO₂ 수동식 기동장치", hot:1},
+ {s:"가스계", q:"이산화탄소소화설비 자동식 기동장치의 설치기준을 쓰시오.", ref:"CO₂ 자동식 기동장치"},
+ {s:"가스계", q:"이산화탄소소화설비 음향경보장치의 설치기준을 쓰시오.", ref:"CO₂ 음향경보장치", hot:1},
+ {s:"가스계", q:"가스계 소화설비 화재표시반의 설치기준과 방출표시등의 설치위치를 쓰시오.", ref:"화재표시반·방출표시등"},
+ {s:"도로터널", q:"도로터널 자동화재탐지설비의 감지기 종류와 설치기준을 쓰시오.", d:["100","10","6.5"], mn:"경계구역 100 · 감열부 사이 10 · 벽에서 6.5", hot:1, src:"NFPC 603 · NFTC 603",
+  a:["감지기 종류: [차동식분포형]감지기, [정온식감지선형]감지기(아날로그식), 중앙소방기술심의위원회 심의로 터널화재 적응성이 인정된 감지기","하나의 경계구역 길이 [100]m 이하","감지기 감열부 사이의 이격거리 [10]m 이하","감지기와 터널 좌·우측 벽면의 이격거리 [6.5]m 이하","아치형 천장: 감열부 사이 10m 이하로 천장 중앙 최상부에 1열 설치 (2열 이상이면 감지기 사이 6.5m 이하)"]},
+ {s:"도로터널", q:"도로터널 비상경보설비의 설치기준을 쓰시오.", d:["50","0.8~1.5","90dB"], mn:"발신기·시각경보기 모두 50m 간격", src:"NFPC 603 · NFTC 603",
+  a:["발신기: 주행차로 한쪽 측벽에 [50]m 이내 간격 (편도 2차선 이상 양방향, 4차로 이상 일방향 터널은 양쪽 측벽에 50m 이내 엇갈리게)","발신기 설치높이: 바닥에서 [0.8~1.5]m","음향장치 음량: 중심에서 1m 떨어진 위치에서 [90]dB 이상","시각경보기: 주행차로 한쪽 측벽에 50m 이내 간격, 비상경보설비 상부 직근"]},
+ {s:"도로터널", q:"도로터널 비상조명등과 비상콘센트설비의 설치기준을 쓰시오.", d:["10lx","1lx","60분","우측 50"], src:"NFPC 603 · NFTC 603",
+  a:["비상조명등 조도: 차도·보도 바닥면 [10]lx 이상, 그 외 모든 지점 [1]lx 이상","비상조명등 비상전원: 상용전원 차단 시 자동 전환, [60]분 이상 점등","비상콘센트: 단상교류 [220]V, 공급용량 [1.5]kVA 이상, 콘센트마다 배선용 차단기","비상콘센트 위치: 주행차로 [우측] 측벽에 [50]m 이내 간격, 바닥에서 0.8~1.5m"]},
+ {s:"지하구", q:"지하구 자동화재탐지설비의 감지기 설치기준을 쓰시오.", d:["1m 단위","30cm"], mn:"발화지점 1m 단위로 찾고, 천장 중심 30cm 안", src:"NFTC 605 2.4 (교재와 한 번 대조 권장)",
+  a:["먼지·습기 등의 영향을 받지 않고 [발화지점(1m 단위)]과 온도를 확인할 수 있는 감지기 설치","지하구 천장 중심부에 설치하고, 감지기와 천장 중심부 하단의 수직거리는 [30]cm 이내","발화지점이 지하구의 실제거리와 일치하도록 수신기 등에 표시","공동구 내부에 상수도용 또는 냉·난방용 설비만 있는 부분은 설치하지 않을 수 있음"]},
+ {s:"2026 개정", q:"2026.3.1 시행 자동화재탐지설비 화재안전성능기준(NFPC 203) 개정 주요내용 3가지를 쓰시오.", ref:"2026년 개정 (NFPC 203, 2026.3.1 시행)", hot:1}
 ]}
 ];
 
 const KEY="fire-elec-memo-v1";
 let marks={}; try{marks=JSON.parse(localStorage.getItem(KEY)||"{}")||{}}catch(e){marks={}}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(marks))}catch(e){}};
-let ui={mode:"study",filter:"all",part:-1,q:"",order:null,open:{},graded:{}};
+let ui={mode:"study",filter:"all",part:-1,q:"",order:null,open:{},graded:{},drafts:{}};
 try{const u=JSON.parse(localStorage.getItem(KEY+"-ui")||"{}");ui.mode=u.mode||"study";ui.part=(u.part??-1)}catch(e){}
 const saveUi=()=>{try{localStorage.setItem(KEY+"-ui",JSON.stringify({mode:ui.mode,part:ui.part}))}catch(e){}};
 
-const ALL=[];PARTS.forEach((p,pi)=>p.items.forEach((it,ii)=>{it.id=(p.quiz?"q":"c")+pi+"-"+ii;it.pi=pi;it.quiz=!!p.quiz;
-  if(it.quiz){it.t=it.s;it.a=[]}ALL.push(it)}));
+const ALL=[];PARTS.forEach((p,pi)=>p.items.forEach((it,ii)=>{it.id=(p.quiz?"q":p.essay?"e":"c")+pi+"-"+ii;it.pi=pi;it.quiz=!!p.quiz;it.essay=!!p.essay;
+  if(it.quiz){it.t=it.s;it.a=[]}if(it.essay){it.t=it.s}ALL.push(it)}));
+(function(){const byT={};ALL.forEach(i=>{if(!i.quiz&&!i.essay)byT[i.t]=i});
+  ALL.forEach(i=>{if(!i.essay||!i.ref)return;const r=byT[i.ref];if(!r){console.warn("ref 없음:",i.ref);i.a=["(정답 카드를 찾지 못했습니다)"];return}
+    i.a=r.a;if(i.d===undefined)i.d=r.d;if(i.mn===undefined)i.mn=r.mn;if(i.tip===undefined)i.tip=r.tip;if(i.src===undefined)i.src=r.src;});})();
 if(ui.part>=PARTS.length)ui.part=-1;
 const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 const hl=s=>esc(s).replace(/\[([^\]]+)\]/g,"<mark>$1</mark>");
@@ -503,14 +619,14 @@ function visible(){
   const q=ui.q.trim().toLowerCase();
   let list=ALL.filter(it=>(ui.part<0||it.pi===ui.part)
     &&(ui.filter!=="hot"||it.hot)&&(ui.filter!=="again"||marks[it.id]==="again")
-    &&(!q||((it.t||"")+" "+(it.q?plain(it.q):"")+" "+(typeof it.d==="string"?it.d:(it.d||[]).join(""))+" "+it.a.map(plain).join(" ")+" "+(it.mn||"")+" "+(it.tip||"")).toLowerCase().includes(q)));
+    &&(!q||((it.t||"")+" "+(it.q?(it.essay?it.q:plain(it.q)):"")+" "+(typeof it.d==="string"?it.d:(it.d||[]).join(""))+" "+it.a.map(plain).join(" ")+" "+(it.mn||"")+" "+(it.tip||"")).toLowerCase().includes(q)));
   if(ui.order){const pos={};ui.order.forEach((id,i)=>pos[id]=i);list=list.slice().sort((a,b)=>(pos[a.id]??0)-(pos[b.id]??0))}
   return list;
 }
 function renderTabs(){
   const el=document.getElementById("tabs");
-  const opts=[{i:-1,name:"전체",n:ALL.length}].concat(PARTS.map((p,i)=>({i,name:p.name,n:p.items.length,quiz:p.quiz})));
-  el.innerHTML=opts.map(o=>`<button class="tab${o.quiz?" quiz":""}" role="tab" data-p="${o.i}" aria-selected="${ui.part===o.i}">${esc(o.name)}<span class="n">${o.n}</span></button>`).join("");
+  const opts=[{i:-1,name:"전체",n:ALL.length}].concat(PARTS.map((p,i)=>({i,name:p.name,n:p.items.length,quiz:p.quiz,essay:p.essay})));
+  el.innerHTML=opts.map(o=>`<button class="tab${o.quiz?" quiz":o.essay?" essay":""}" role="tab" data-p="${o.i}" aria-selected="${ui.part===o.i}">${esc(o.name)}<span class="n">${o.n}</span></button>`).join("");
 }
 function acts(it){const m=marks[it.id]||"";
   return `<div class="acts"><button class="g" data-act="ok" aria-pressed="${m==="ok"}">외웠음</button><button class="r" data-act="again" aria-pressed="${m==="again"}">다시 볼 것</button></div>`}
@@ -523,8 +639,27 @@ function quizCard(it){
   if(hide)h+=`<div class="qrow"><button class="btn" data-act="grade">채점</button><button class="btn" data-act="show">정답 보기</button></div><div class="qres" aria-live="polite"></div>`;
   return h+acts(it)+`</article>`;
 }
+function essayCard(it){
+  const m=marks[it.id]||"";const hide=ui.mode==="hide"&&!ui.open[it.id];const gs=groups(it.d);
+  let h=`<article class="card ${m}" data-id="${it.id}"><div class="head"><h3>${esc(it.s)}</h3><div class="tags">${it.hot?'<span class="tag hot">빈출</span>':""}</div></div>`;
+  h+=`<p class="eq">${esc(it.q)}</p>`;
+  const dr=ui.drafts[it.id]||"";
+  if(hide){
+    h+=`<textarea class="draft" placeholder="떠오르는 대로 답안을 써 보세요 (안 써도 됩니다)" aria-label="내 답안">${esc(dr)}</textarea>`;
+    h+=`<div class="hidebox"><button class="reveal" data-act="open">정답 확인</button></div>`;
+  }else{
+    if(dr.trim())h+=`<p class="mine">${esc(dr)}</p>`;
+    if(gs.length)h+=`<div class="tiles" aria-label="두문자">${gs.map(g=>`<span class="g">${g.map(c=>`<span>${esc(c)}</span>`).join("")}</span>`).join("")}</div>`;
+    if(it.mn)h+=`<p class="mn">${esc(it.mn)}</p>`;
+    if(it.tip)h+=`<p class="tip">${esc(it.tip)}</p>`;
+    h+=`<ol class="ans">${it.a.map(x=>`<li>${hl(x)}</li>`).join("")}</ol>`;
+    h+=`<div class="src">근거: ${esc(it.src||"")}</div>`;
+  }
+  return h+acts(it)+`</article>`;
+}
 function card(it){
   if(it.quiz)return quizCard(it);
+  if(it.essay)return essayCard(it);
   const m=marks[it.id]||"";const hide=ui.mode==="hide"&&!ui.open[it.id];
   const gs=groups(it.d);
   let h=`<article class="card ${m}" data-id="${it.id}"><div class="head"><h3>${esc(it.t)}</h3><div class="tags">`;
@@ -554,7 +689,7 @@ function render(){
   document.getElementById("pbar").style.width=(scope.length?ok/scope.length*100:0)+"%";
   if(!list.length){main.innerHTML=`<p class="empty">${ui.filter==="again"?"다시 볼 카드가 없습니다. 카드에서 '다시 볼 것'을 누르면 여기에 모입니다.":"조건에 맞는 카드가 없습니다. 검색어나 거르기를 바꿔 보세요."}</p>`;return}
   let html="",last=null;
-  list.forEach(it=>{if(ui.part<0&&!ui.order&&it.pi!==last){html+=`<h2 class="sec${PARTS[it.pi].quiz?" q":""}">${esc(PARTS[it.pi].name)}</h2>`;last=it.pi}html+=card(it)});
+  list.forEach(it=>{if(ui.part<0&&!ui.order&&it.pi!==last){html+=`<h2 class="sec${PARTS[it.pi].quiz?" q":PARTS[it.pi].essay?" e":""}">${esc(PARTS[it.pi].name)}</h2>`;last=it.pi}html+=card(it)});
   main.innerHTML=html;
 }
 function grade(cardEl,it,reveal){
@@ -588,7 +723,19 @@ document.getElementById("list").addEventListener("click",e=>{
   document.getElementById("pbar").style.width=(scope.length?ok/scope.length*100:0)+"%";
 });
 document.getElementById("list").addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.matches(".qt input")){const c=e.target.closest(".card");grade(c,byId[c.dataset.id],false)}});
+document.getElementById("list").addEventListener("input",e=>{if(e.target.matches(".draft")){ui.drafts[e.target.closest(".card").dataset.id]=e.target.value}});
+document.getElementById("bkOut").onclick=async()=>{
+  const code=btoa(unescape(encodeURIComponent(JSON.stringify(marks))));
+  try{await navigator.clipboard.writeText(code);alert("기록을 복사했습니다. 다른 기기에서 '기록 불러오기'에 붙여 넣으세요.")}
+  catch(e){window.prompt("아래 코드를 복사하세요",code)}};
+document.getElementById("bkIn").onclick=()=>{
+  const code=window.prompt("'기록 내보내기'로 복사한 코드를 붙여 넣으세요");if(!code)return;
+  try{const m=JSON.parse(decodeURIComponent(escape(atob(code.trim()))));if(typeof m!=="object"||!m)throw 0;
+    marks=Object.assign(marks,m);save();render();alert("기록을 불러왔습니다.")}catch(e){alert("코드가 올바르지 않습니다. 다시 복사해 주세요.")}};
 render();
+if("serviceWorker" in navigator&&/^https?:$/.test(location.protocol)){
+  window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})});
+}
 </script>
 </body>
 </html>
